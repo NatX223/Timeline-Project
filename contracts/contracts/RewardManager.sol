@@ -8,6 +8,9 @@ contract RewardManager {
     // Mapping to store earnings for each address
     mapping(address => uint256) public userEarnings;
     
+    // Array holding all participants
+    address[] public participants;
+
     // Mapping to store percentage shares for each address
     mapping(address => uint256) public percentageShares;
     
@@ -44,9 +47,10 @@ contract RewardManager {
         for (uint256 i = 0; i < addresses.length; i++) {
             percentageShares[addresses[i]] = percentages[i];
             total += percentages[i];
+            participants.push(addresses[i]);
         }
         
-        require(total == 100, "Total percentage must be 100");
+        require(total == 10000, "Total percentage must be 10000");
         totalPercentage = total;
         initialized = true;
         
@@ -70,15 +74,12 @@ contract RewardManager {
     }
     
     receive() external payable onlyInitialized {
-        require(msg.value > 0, "Must send some ETH");
-        
-        for (uint256 i = 0; i < 100; i++) {
-            address user = address(uint160(i)); // This is a placeholder - you'll need to implement proper address iteration
-            if (percentageShares[user] > 0) {
-                uint256 share = (msg.value * percentageShares[user]) / 100;
-                userEarnings[user] += share;
-                emit EarningsUpdated(user, share);
-            }
+        uint256 received = msg.value;
+        for (uint256 i = 0; i < participants.length; i++) {
+            address user = participants[i];
+            uint256 userShare = (received * percentageShares[user]) / 10000;
+            userEarnings[user] += userShare;
+            emit EarningsUpdated(user, userShare);
         }
     }
 } 
