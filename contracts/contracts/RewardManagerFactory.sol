@@ -5,9 +5,7 @@ import "./RewardManager.sol";
 
 contract RewardManagerFactory {
     address public owner;
-    address[] public deployedContracts;
-    mapping(address => bool) public isDeployed;
-    mapping(address => bool) public isUsed;
+    address public latestContract;
     
     event RewardManagerDeployed(address indexed contractAddress);
     
@@ -20,34 +18,16 @@ contract RewardManagerFactory {
         _;
     }
     
-    function deployRewardManager() external onlyOwner returns (address) {
-        RewardManager newContract = new RewardManager();
+    function deployRewardManager() external onlyOwner {
+        RewardManager newContract = new RewardManager(msg.sender);
         address contractAddress = address(newContract);
         
-        deployedContracts.push(contractAddress);
-        isDeployed[contractAddress] = true;
-        isUsed[contractAddress] = false;
+        latestContract = contractAddress;
         
         emit RewardManagerDeployed(contractAddress);
-        return contractAddress;
     }
     
-    function getLatestUnusedContract() external view returns (address) {
-        for (uint i = deployedContracts.length; i > 0; i--) {
-            address contractAddress = deployedContracts[i - 1];
-            if (isDeployed[contractAddress] && !isUsed[contractAddress]) {
-                return contractAddress;
-            }
-        }
-        return address(0);
-    }
-    
-    function markContractAsUsed(address contractAddress) external onlyOwner {
-        require(isDeployed[contractAddress], "Contract not deployed");
-        isUsed[contractAddress] = true;
-    }
-    
-    function getAllDeployedContracts() external view returns (address[] memory) {
-        return deployedContracts;
+    function getDeployedContract() external view returns (address) {
+        return latestContract;
     }
 } 

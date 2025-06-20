@@ -21,8 +21,8 @@ contract RewardManager {
     event ClaimProcessed(address indexed user, uint256 amount);
     event Initialized();
     
-    constructor() {
-        owner = msg.sender;
+    constructor(address _owner) {
+        owner = _owner;
         initialized = false;
     }
     
