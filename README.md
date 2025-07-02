@@ -3,7 +3,7 @@ A Farcaster mini app that monitizes memories and acheivements on Farcaster by co
 
 ---  
 
-## Live Link - https://timeline-staging.vercel.app/
+## Live Link - https://farcaster.xyz/miniapps/5RHnu11U9EzF/timeline
 ## Demo - 
 
 ## Table of Contents  
