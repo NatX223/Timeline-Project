@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-
 contract RewardManager {
     address public owner;
     bool public initialized;
@@ -14,7 +13,7 @@ contract RewardManager {
     // Mapping to store percentage shares for each address
     mapping(address => uint256) public percentageShares;
     
-    // Total percentage (should be 100)
+    // Total percentage (should be 10000)
     uint256 public totalPercentage;
     
     event EarningsUpdated(address indexed user, uint256 amount);
