@@ -112,8 +112,7 @@ Below is a code snippet showing how createCoin was used in the project.
       });
 });
 ```
-The full code for how createCoin was used can be found [here](https://github.com/NatX223/timeline/blob/master/src/components/CreateTimeline.
-tsx). A transaction showing the use of the createCoin function can be found [here](https://basescan.org/tx/0x90805b77d28937801010ddfb12d45381909c0e15797bf168c459d793782d5374) 
+The full code for how createCoin was used can be found [here](https://github.com/NatX223/timeline/blob/master/src/components/CreateTimeline.tsx). A transaction showing the use of the createCoin function can be found [here](https://basescan.org/tx/0x90805b77d28937801010ddfb12d45381909c0e15797bf168c459d793782d5374) 
 
 - Trade Coin - Another key component that is integral to the project is the use of the trade Coin functionality. Timeline also gives users the ability 
 to trade coins that other users have created.
@@ -192,7 +191,7 @@ The table below showcases the different transaction types and some examples
 
 ### Farcaster
 
-Farcaster is the platform we ebuilt on - making a mini-app for farcaster users to easily discover, engage with and share timelines. The Neynar API
+Farcaster is the platform we built on - making a mini-app for farcaster users to easily discover, engage with and share timelines. The Neynar API
 was also instrumental in the project for fetching user profiles and casts.
 Below is a code snippet showing how the Neynar API was used 
 ```typescript
@@ -216,8 +215,12 @@ if (data.users && data.users.length > 0) {
 }
 return NextResponse.json({ error: 'User not found' }, { status: 404 });
 ``` 
-The full code for how Neynar API and its responses was used can be found [here](https://github.com/NatX223/farcaster-timeline/blob/master/src/app/api/
-user-profile/route.ts).
+
+The mini app manifast is shown below:
+
+![mini app manifest](/manifest.png)
+
+The full code for how the Neynar API and its responses was used can be found [here](https://github.com/NatX223/timeline/blob/master/src/app/api/user-profile/route.ts).
 
 ### Solidity
 
@@ -232,7 +235,7 @@ contracts were used to handle the supporter earnings payout.
 
 ### Next.js
 
-The Next.js code can be found [here](https://github.com/NatX223/farcaster-timeline/)
+The Next.js code can be found [here](https://github.com/NatX223/timeline/)
 
 
 ## Setup and Deployment  
@@ -297,7 +300,7 @@ clone the repository first
 clone the repository
 
 ```bash
-  git clone https://github.com/NatX223/farcaster-timeline  
+  git clone https://github.com/NatX223/timeline  
 ```
 
 1. Navigate to .env.example and set your parameters right
