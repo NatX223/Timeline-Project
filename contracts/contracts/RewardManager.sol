@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 contract RewardManager {
     address public owner;
     bool public initialized;
-    
-    // Mapping to store earnings for each address
-    mapping(address => uint256) public userEarnings;
+    IERC20 public rewardToken;
     
     // Array holding all participants
     address[] public participants;
@@ -20,9 +21,10 @@ contract RewardManager {
     event ClaimProcessed(address indexed user, uint256 amount);
     event Initialized();
     
-    constructor(address _owner) {
+    constructor(address _owner, address _rewardToken) {
         owner = _owner;
         initialized = false;
+        rewardToken = IERC20(_rewardToken);
     }
     
     modifier onlyOwner() {
@@ -32,6 +34,11 @@ contract RewardManager {
     
     modifier onlyInitialized() {
         require(initialized, "Contract not initialized");
+        _;
+    }
+    
+    modifier sufficientEarnings(uint256 amount) {
+        require(getUserEarnings(msg.sender) >= amount, "Insufficient earnings");
         _;
     }
     
@@ -56,29 +63,17 @@ contract RewardManager {
         emit Initialized();
     }
     
-    function claim(uint256 amount) external onlyInitialized {
+    function claim(uint256 amount) external onlyInitialized sufficientEarnings(amount) {
         require(amount > 0, "Amount must be greater than 0");
-        require(userEarnings[msg.sender] >= amount, "Insufficient earnings");
         
-        userEarnings[msg.sender] -= amount;
-        
-        (bool success, ) = msg.sender.call{value: amount}("");
-        require(success, "Transfer failed");
+        require(rewardToken.transfer(msg.sender, amount), "Transfer failed");
         
         emit ClaimProcessed(msg.sender, amount);
     }
     
-    function getUserEarnings(address user) external view returns (uint256) {
-        return userEarnings[user];
-    }
-    
-    receive() external payable onlyInitialized {
-        uint256 received = msg.value;
-        for (uint256 i = 0; i < participants.length; i++) {
-            address user = participants[i];
-            uint256 userShare = (received * percentageShares[user]) / 10000;
-            userEarnings[user] += userShare;
-            emit EarningsUpdated(user, userShare);
-        }
+    function getUserEarnings(address user) public view returns (uint256) {
+        uint256 value = rewardToken.balanceOf(address(this));
+        uint256 userShare = (value * percentageShares[user]) / 10000;
+        return userShare;
     }
 } 

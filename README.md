@@ -4,7 +4,7 @@ A Farcaster mini app that monitizes memories and acheivements on Farcaster by co
 ---  
 
 ## Live Link - https://farcaster.xyz/miniapps/5RHnu11U9EzF/timeline
-## Demo - 
+## Demo - https://www.loom.com/share/4f746c4085b749e58f62f88594ac7a3d?sid=918a6bf4-cb10-46ea-8602-584a73612ea0
 
 ## Table of Contents  
 
@@ -83,32 +83,112 @@ Zora is the engine behind timeline and it powers the tokenization of casts as we
 coins without having to worry about technicalities. The reward manager contract address was used as the `payoutRecipient` address.
 Below is a code snippet showing how createCoin was used in the project.
 ```typescript
-try {
-  const coinParams = {
-  name: timelineName,
-  symbol: timelineName.substring(0, 3).toUpperCase(),
-  uri: metadataUrl,
-  payoutRecipient: rewardManager as Address,
-  platformReferrer: rewardManager as Address,
-  chainId: baseSepolia.id,
-  currency: DeployCurrency.ETH,
-};
+  const createZoraCoin = async (metadataUrl: string, timelineName: string, rewardManager: string) => {
+    if (!walletClient || !address) {
+      console.error('Wallet client or address not available');
+      throw new Error('Wallet not connected');
+    }
 
-console.log('Creating coin with params:', coinParams);
-const result = await createCoin(coinParams, walletClient, publicClient, {
-  gasMultiplier: 120,
+    try {
+      const coinParams = {
+        name: timelineName,
+        symbol: timelineName.substring(0, 3).toUpperCase(),
+        uri: metadataUrl as ValidMetadataURI,
+        owners: [address as Address],
+        payoutRecipient: rewardManager as Address,
+        platformReferrer: rewardManager as Address,
+        chainId: base.id,
+        currency: DeployCurrency.ZORA,
+        initialPurchase: { 
+          currency: InitialPurchaseCurrency.ETH,
+          amount: parseEther("0.0005"),
+        },
+      };
+
+      console.log('Creating coin with params:', coinParams);
+      console.log('connected chain', publicClient.chain)
+      const result = await createCoin(coinParams, walletClient, publicClient, {
+        gasMultiplier: 120,
+      });
 });
 ```
-The full code for how createCoin was used can be found [here](https://github.com/NatX223/farcaster-timeline/blob/master/src/components/CreateTimeline.
-tsx). A transaction showing the use of the createCoin function can be found [here](https://sepolia.basescan.org/tx/
-0x9aa8802e9d433dd64bfd63eca3859f6f5af7bb9bef6c4875d1dcdb3d11bc5194) 
+The full code for how createCoin was used can be found [here](https://github.com/NatX223/timeline/blob/master/src/components/CreateTimeline.
+tsx). A transaction showing the use of the createCoin function can be found [here](https://basescan.org/tx/0x90805b77d28937801010ddfb12d45381909c0e15797bf168c459d793782d5374) 
 
 - Trade Coin - Another key component that is integral to the project is the use of the trade Coin functionality. Timeline also gives users the ability 
 to trade coins that other users have created.
 Below is a code snippet showing how tradeCoin was used 
 ```typescript
+  const handleBuy = async () => {
+    if (!walletClient || !address || !timeline?.coinAddress || !amount) return;
+    setTxLoading(true);
+    setTxError(null);
+    setTxSuccess(null);
+    try {
+      const account = walletClient.account || address;
+      const tradeParameters: TradeParameters = {
+        sell: {
+          type: 'erc20',
+          address: '0x1111111111166b7FE7bd91427724B487980aFc69', // ZORA
+        },
+        buy: {
+          type: 'erc20',
+          address: timeline.coinAddress,
+        },
+        amountIn: parseEther(amount),
+        slippage: 0.04,
+        sender: address,
+      };
+      await tradeCoin({ tradeParameters, walletClient, account, publicClient });
+      setTxSuccess('Buy transaction successful!');
+    } catch (err: any) {
+      setTxError(err.message || 'Transaction failed');
+    } finally {
+      setTxLoading(false);
+    }
+  };
 
+  const handleSell = async () => {
+    if (!walletClient || !address || !timeline?.coinAddress || !amount) return;
+    setTxLoading(true);
+    setTxError(null);
+    setTxSuccess(null);
+    try {
+      const account = walletClient.account || address;
+      const tradeParameters: TradeParameters = {
+        sell: {
+          type: 'erc20',
+          address: timeline.coinAddress,
+        },
+        buy: {
+          type: 'erc20',
+          address: '0x1111111111166b7FE7bd91427724B487980aFc69', // ZORA
+        },
+        amountIn: parseEther(amount),
+        slippage: 0.04,
+        sender: address,
+      };
+      await tradeCoin({ tradeParameters, walletClient, account, publicClient, validateTransaction: false });
+      setTxSuccess('Sell transaction successful!');
+    } catch (err: any) {
+      setTxError(err.message || 'Transaction failed');
+    } finally {
+      setTxLoading(false);
+    }
+  };
 ``` 
+
+The full code for how tradeCoin was used can be found [here](https://github.com/NatX223/timeline/blob/master/src/components/timeline/TimelineView.tsx). Transactions 
+showing the use of the createCoin function can be found [here](https://basescan.org/tx/0x8c98a704ec7c4cf91097b3810a05e472a920b53a36bbb61102b03d8942f84ce7) and [here](https://basescan.org/tx/0x2fbe7296144752550939a15f3ac8d49b0f80d3df0b6498d9a81301a1abf7872f)
+
+The table below showcases the different transaction types and some examples
+
+| **TX type**         | **TX example**                                                                             |
+|---------------------|--------------------------------------------------------------------------------------------|
+| **Create Coin**     | https://basescan.org/tx/0x90805b77d28937801010ddfb12d45381909c0e15797bf168c459d793782d5374 |
+| **Sell Coin**       | https://basescan.org/tx/0x8c98a704ec7c4cf91097b3810a05e472a920b53a36bbb61102b03d8942f84ce7 |
+| **Buy Coin**        | https://basescan.org/tx/0x2fbe7296144752550939a15f3ac8d49b0f80d3df0b6498d9a81301a1abf7872f |
+| **Claim fess**      | https://basescan.org/tx/0x2fbe7296144752550939a15f3ac8d49b0f80d3df0b6498d9a81301a1abf7872f |
 
 ### Farcaster
 
@@ -145,11 +225,10 @@ The reward manager factory contract was developed and deployed to aid the easy u
 contracts were used to handle the supporter earnings payout.
 - The smart contracts were deployed on the Base Sepolia testnet, below is a table showing the contracts deployed and their addreess
 
-| **Contract**        | **Addres**                                 | **Function**                                                             |
-|---------------------|--------------------------------------------|--------------------------------------------------------------------------|
-| **ManagerFactory**  | 0xf87C8aDc1442e122fE0B68a1e615B105b6095f78 | Deploying reward manager contracts                                       |
-| **RewardManager**   | 0x72b3d2f2127b7bbbb25d85c8d065687c472c6dfa | payout recipient and Supporter earnings payout                           |
-
+| **Contract**        | **Addres**                                 | **Function**                                  |
+|---------------------|--------------------------------------------|-----------------------------------------------|
+| **ManagerFactory**  | 0x10B84362072E1E71b390546B2324e0111E51a03c | Deploying reward manager contracts            |
+| **RewardManager**   | 0xdd3cb7de06e209d760c8b886e6ca7bcc2a0f1c8b | payout recipient and Supporter earnings payout|
 
 ### Next.js
 

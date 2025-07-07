@@ -5,31 +5,32 @@ const { ethers } = require('hardhat');
 async function main() {
     const [signer] = await ethers.getSigners();
     const ownerAddress = await signer.getAddress();
+    const zoraToken = "0x1111111111166b7FE7bd91427724B487980aFc69";
 
     console.log("Deploying with address:", ownerAddress);
 
     const managerFactory = await ethers.getContractFactory('RewardManagerFactory', signer);
-    const managerfactory = await managerFactory.deploy();
+    const managerfactory = await managerFactory.deploy(zoraToken);
     const managerfactoryAddress = await managerfactory.getAddress();
 
     console.log(`RewardManagerFactory deployed to: ${managerfactoryAddress}`);
 
     // Deploy RewardManager contract
-    console.log("deploying reward manager");
-    await deployRewardManager(managerfactoryAddress, signer);
-    console.log(`Deployed RewardManager contract`);
+    // console.log("deploying reward manager");
+    // await deployRewardManager(managerfactoryAddress, signer);
+    // console.log(`Deployed RewardManager contract`);
 
     // Get all deployed contracts to verify
-    const contractAddress = await managerfactory.getDeployedContract();
-    console.log("All deployed contract addresses:", contractAddress);
+    // const contractAddress = await managerfactory.getDeployedContract();
+    // console.log("All deployed contract addresses:", contractAddress);
 
-    // Save all addresses to a file
-    const addresses = {
-        rewardManagerFactory: managerfactoryAddress
-    };
+    // // Save all addresses to a file
+    // const addresses = {
+    //     rewardManagerFactory: managerfactoryAddress
+    // };
 
-    fs.writeFileSync('deployedAddresses.json', JSON.stringify(addresses, null, 2));
-    console.log('All addresses have been saved to deployedAddresses.json');
+    // fs.writeFileSync('deployedAddresses.json', JSON.stringify(addresses, null, 2));
+    // console.log('All addresses have been saved to deployedAddresses.json');
 }
 
 async function deployRewardManager(managerfactoryAddress, signer) {

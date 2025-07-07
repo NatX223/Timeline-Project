@@ -6,11 +6,13 @@ import "./RewardManager.sol";
 contract RewardManagerFactory {
     address public owner;
     address public latestContract;
+    address public rewardToken;
     
     event RewardManagerDeployed(address indexed contractAddress);
     
-    constructor() {
+    constructor(address _rewardToken) {
         owner = msg.sender;
+        rewardToken = _rewardToken;
     }
     
     modifier onlyOwner() {
@@ -19,7 +21,7 @@ contract RewardManagerFactory {
     }
     
     function deployRewardManager() external onlyOwner {
-        RewardManager newContract = new RewardManager(msg.sender);
+        RewardManager newContract = new RewardManager(msg.sender, rewardToken);
         address contractAddress = address(newContract);
         
         latestContract = contractAddress;
