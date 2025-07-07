@@ -220,6 +220,10 @@ The mini app manifast is shown below:
 
 ![mini app manifest](/manifest.png)
 
+App stats:
+
+![mini app stats](/stats.png)
+
 The full code for how the Neynar API and its responses was used can be found [here](https://github.com/NatX223/timeline/blob/master/src/app/api/user-profile/route.ts).
 
 ### Solidity
